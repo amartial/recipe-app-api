@@ -20,6 +20,7 @@ def detail_url(ingredien_id):
     """Create and return an ingredient detail URL."""
     return reverse('recipe:ingredient-detail', args=[ingredien_id])
 
+
 def create_user(email='user@example.com', password='testpass123'):
     """Create and return user."""
     return get_user_model().objects.create(email=email, password=password)

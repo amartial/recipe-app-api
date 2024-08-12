@@ -1,4 +1,3 @@
-
 """
 Tests for recipe APIs.
 """
@@ -341,7 +340,7 @@ class PrivateRecipeApiTests(TestCase):
             self.assertTrue(exists)
 
     def test_create_ingredient_on_update(self):
-        """Test create ingredient when updating a recipe."""
+        """Test creating an ingredient when updating a recipe."""
         recipe = create_recipe(user=self.user)
 
         payload = {'ingredients': [{'name': 'Limes'}]}
@@ -354,18 +353,18 @@ class PrivateRecipeApiTests(TestCase):
 
     def test_update_recipe_assign_ingredient(self):
         """Test assigning an existing ingredient when updating a recipe."""
-        ingredient_pepper = Ingredient.objects.create(user=self.user, name='Pepper')
+        ingredient1 = Ingredient.objects.create(user=self.user, name='Pepper')
         recipe = create_recipe(user=self.user)
-        recipe.ingredients.add(ingredient_pepper)
+        recipe.ingredients.add(ingredient1)
 
-        ingredient_chili = Ingredient.objects.create(user=self.user, name='Chili')
+        ingredient2 = Ingredient.objects.create(user=self.user, name='Chili')
         payload = {'ingredients': [{'name': 'Chili'}]}
         url = detail_url(recipe.id)
         res = self.client.patch(url, payload, format='json')
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertIn(ingredient_chili, recipe.ingredients.all())
-        self.assertNotIn(ingredient_pepper, recipe.ingredients.all())
+        self.assertIn(ingredient2, recipe.ingredients.all())
+        self.assertNotIn(ingredient1, recipe.ingredients.all())
 
     def test_clear_recipe_ingredients(self):
         """Test clearing a recipes ingredients."""
@@ -387,7 +386,7 @@ class ImageUploadTests(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.user = get_user_model().objects.create_user(
-            'user@exemple.com',
+            'user@example.com',
             'password123',
         )
         self.client.force_authenticate(self.user)
@@ -401,7 +400,7 @@ class ImageUploadTests(TestCase):
         url = image_upload_url(self.recipe.id)
         with tempfile.NamedTemporaryFile(suffix='.jpg') as image_file:
             img = Image.new('RGB', (10, 10))
-            img.sava(image_file, format='JPEG')
+            img.save(image_file, format='JPEG')
             image_file.seek(0)
             payload = {'image': image_file}
             res = self.client.post(url, payload, format='multipart')
@@ -412,10 +411,9 @@ class ImageUploadTests(TestCase):
         self.assertTrue(os.path.exists(self.recipe.image.path))
 
     def test_upload_image_bad_request(self):
-        """Test uploading invalid image."""
+        """Test uploading an invalid image."""
         url = image_upload_url(self.recipe.id)
         payload = {'image': 'notanimage'}
         res = self.client.post(url, payload, format='multipart')
 
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
-

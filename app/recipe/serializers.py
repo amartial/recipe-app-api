@@ -11,7 +11,7 @@ from core.models import (
 
 
 class IngredientSerializer(serializers.ModelSerializer):
-    """Serializer for ingredient."""
+    """Serializer for ingredients."""
 
     class Meta:
         model = Ingredient
@@ -36,8 +36,8 @@ class RecipeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         fields = [
-            'id', 'title', 'time_minutes', 'price',
-            'link', 'tags', 'ingredients',
+            'id', 'title', 'time_minutes', 'price', 'link', 'tags',
+            'ingredients',
         ]
         read_only_fields = ['id']
 
@@ -63,8 +63,8 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         """Create a recipe."""
-        ingredients = validated_data.pop('ingredients', [])
         tags = validated_data.pop('tags', [])
+        ingredients = validated_data.pop('ingredients', [])
         recipe = Recipe.objects.create(**validated_data)
         self._get_or_create_tags(tags, recipe)
         self._get_or_create_ingredients(ingredients, recipe)
@@ -97,10 +97,10 @@ class RecipeDetailSerializer(RecipeSerializer):
 
 
 class RecipeImageSerializer(serializers.ModelSerializer):
-    """Serializer for uploading to recipes."""
+    """Serializer for uploading images to recipes."""
 
     class Meta:
         model = Recipe
-        fields = [id, 'image']
+        fields = ['id', 'image']
         read_only_fields = ['id']
         extra_kwargs = {'image': {'required': 'True'}}
